@@ -1,0 +1,103 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery.Jcrop.min.js"></script>
+
+<!--
+`j-crop`
+Crop image element using jcrop library http://deepliquid.com/content/Jcrop.html
+
+@demo demo/index.html 
+-->
+
+<dom-module id="j-crop">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <img src="/Desert.jpg" id="targetImage">
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'j-crop',
+
+      properties: {
+          image: String,
+          cropImage: String,
+          aspectRatio: {
+              type: Number,
+              value: 1
+          },
+          minWidth: {
+              type: Number,
+              value: 0
+          },
+          minHeight: {
+              type: Number,
+              value: 0
+          },
+          maxWidth: {
+              type: Number,
+              value: 0
+          },
+          maxHeight: {
+              type: Number,
+              value: 0
+          },
+          xOne: {
+              type: Number,
+              value: 0
+          },
+          xTwo: {
+              type: Number,
+              value: 0
+          },
+          yOne: {
+              type: Number,
+              value: 0
+          },
+          yTwo: {
+              type: Number,
+              value: 0
+          },
+          bgColor: {
+              type: String,
+              value: 'black'
+          },
+          bgOpacity: {
+              type: Number,
+              value: 0.6
+          }
+      },
+      ready: function() {
+          var image = this.$.targetImage;
+              
+          $(image).Jcrop({ 
+              aspectRatio: this.aspectRatio,
+              minSize: [this.minWidth, this.minHeight],
+              maxSize: [this.maxWidth, this.maxHeight],
+              setSelect: [ this.xOne, this.yOne, this.yOne, this.yTwo ],
+              bgColor: this.bgColor,
+              bgOpacity: this.bgOpacity,
+              onSelect: this._select,
+              onChange: this._change,
+              onRelease: this._release
+          });
+      },
+      _select: function() {
+          console.log('select');
+      },
+      _change: function() {
+          console.log('change');
+      },
+      _release: function() {
+          console.log('release');
+      }
+    });
+  </script>
+</dom-module>
