@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="shared-styles.html">
 <script src="js/jquery.min.js"></script>
 <script src="js/jquery.Jcrop.min.js"></script>
@@ -18,6 +19,7 @@ Crop image element using jcrop library http://deepliquid.com/content/Jcrop.html
         display: block;
       }
     </style>
+    <paper-button on-tap="_crop">test</paper-button>
     <img src="/Desert.jpg" id="targetImage">
   </template>
 
@@ -29,6 +31,7 @@ Crop image element using jcrop library http://deepliquid.com/content/Jcrop.html
       properties: {
           image: String,
           cropImage: String,
+          api: Object,
           aspectRatio: {
               type: Number,
               value: 1
@@ -76,17 +79,22 @@ Crop image element using jcrop library http://deepliquid.com/content/Jcrop.html
       },
       ready: function() {
           var image = this.$.targetImage;
+          const promise = new Promise(function(resolve, reject) {
+              $(image).Jcrop({ 
+                  aspectRatio: this.aspectRatio,
+                  minSize: [this.minWidth, this.minHeight],
+                  maxSize: [this.maxWidth, this.maxHeight],
+                  setSelect: [ this.xOne, this.yOne, this.yOne, this.yTwo ],
+                  bgColor: this.bgColor,
+                  bgOpacity: this.bgOpacity,
+                  onSelect: this._select,
+                  onChange: this._change,
+                  onRelease: this._release
+              }, function(){resolve(this);});
+          });
               
-          $(image).Jcrop({ 
-              aspectRatio: this.aspectRatio,
-              minSize: [this.minWidth, this.minHeight],
-              maxSize: [this.maxWidth, this.maxHeight],
-              setSelect: [ this.xOne, this.yOne, this.yOne, this.yTwo ],
-              bgColor: this.bgColor,
-              bgOpacity: this.bgOpacity,
-              onSelect: this._select,
-              onChange: this._change,
-              onRelease: this._release
+          promise.then((res)=>{
+              this.api = res;
           });
       },
       _select: function() {
@@ -97,6 +105,9 @@ Crop image element using jcrop library http://deepliquid.com/content/Jcrop.html
       },
       _release: function() {
           console.log('release');
+      },
+      _crop: function() {
+          console.log(this.api);
       }
     });
   </script>
