@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-image/iron-image.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="shared-styles.html">
 <script src="js/jquery.min.js"></script>
@@ -20,7 +21,7 @@ Crop image element using jcrop library http://deepliquid.com/content/Jcrop.html
       }
     </style>
     <paper-button on-tap="_crop">test</paper-button>
-    <img src="/Desert.jpg" id="targetImage">
+    <img src$="{{src}}" id="targetImage">
   </template>
 
   <script>
@@ -29,7 +30,7 @@ Crop image element using jcrop library http://deepliquid.com/content/Jcrop.html
       is: 'j-crop',
 
       properties: {
-          image: String,
+          src: String,
           cropImage: String,
           api: Object,
           aspectRatio: {
@@ -80,7 +81,11 @@ Crop image element using jcrop library http://deepliquid.com/content/Jcrop.html
       ready: function() {
           var image = this.$.targetImage;
           const promise = new Promise(function(resolve, reject) {
-              $(image).Jcrop({ 
+              $(image).Jcrop({}, function(){resolve(this);});
+          });
+              
+          promise.then((res)=>{
+              var options = { 
                   aspectRatio: this.aspectRatio,
                   minSize: [this.minWidth, this.minHeight],
                   maxSize: [this.maxWidth, this.maxHeight],
@@ -90,11 +95,10 @@ Crop image element using jcrop library http://deepliquid.com/content/Jcrop.html
                   onSelect: this._select,
                   onChange: this._change,
                   onRelease: this._release
-              }, function(){resolve(this);});
-          });
-              
-          promise.then((res)=>{
+              };
               this.api = res;
+              this.api.setOptions(options);
+              console.log(this.api.onSelect); 
           });
       },
       _select: function() {
@@ -107,7 +111,13 @@ Crop image element using jcrop library http://deepliquid.com/content/Jcrop.html
           console.log('release');
       },
       _crop: function() {
-          console.log(this.api);
+          var dimensions = this.api.tellSelect();
+          var canvas = document.createElement('canvas');
+          canvas.width  = dimensions.w;
+          canvas.height = dimensions.h;
+          var context = canvas.getContext('2d');
+          context.drawImage(this.$.targetImage, dimensions.x, dimensions.y, dimensions.w, dimensions.h,0,0,dimensions.w,dimensions.h);
+          return canvas.toDataURL();
       }
     });
   </script>
